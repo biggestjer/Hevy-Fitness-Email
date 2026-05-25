@@ -1,0 +1,32 @@
+name: Hevy Daily Coaching Email
+
+on:
+  schedule:
+    # 6:00am CST (UTC-6) = 12:00 UTC
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allows manual runs from the GitHub Actions tab
+
+jobs:
+  send-coaching-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: python3 -m pip install requests anthropic python-dotenv
+
+      - name: Run coaching email script
+        env:
+          HEVY_API_KEY: ${{ secrets.HEVY_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: python3 hevy_daily_email.py
